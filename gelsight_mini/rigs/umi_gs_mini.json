@@ -57,7 +57,10 @@
         76,
         36.4,
         22.2
-      ]
+      ],
+      "automatic_detector": "circular_screw",
+      "head_radius_mm": 2.5,
+      "search_radius_px": 14
     },
     {
       "name": "cover_right",
@@ -66,7 +69,10 @@
         -76,
         36.4,
         22.2
-      ]
+      ],
+      "automatic_detector": "circular_screw",
+      "head_radius_mm": 2.5,
+      "search_radius_px": 14
     },
     {
       "name": "cover_upper",
@@ -75,7 +81,10 @@
         -15.3,
         -18.44,
         22.2
-      ]
+      ],
+      "automatic_detector": "circular_screw",
+      "head_radius_mm": 2.5,
+      "search_radius_px": 14
     },
     {
       "name": "rail_left",
@@ -84,7 +93,10 @@
         70,
         61,
         0
-      ]
+      ],
+      "automatic_detector": "circular_screw",
+      "head_radius_mm": 2.5,
+      "search_radius_px": 14
     },
     {
       "name": "rail_right",
@@ -93,7 +105,10 @@
         -70,
         61,
         0
-      ]
+      ],
+      "automatic_detector": "circular_screw",
+      "head_radius_mm": 2.5,
+      "search_radius_px": 14
     },
     {
       "name": "finger_left_upper_screw",

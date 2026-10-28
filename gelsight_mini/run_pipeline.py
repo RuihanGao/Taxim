@@ -20,11 +20,21 @@ def run_pipeline(config_path,output,cad_python=None):
     out.mkdir(parents=True)
     if cfg.get('landmarks'):
         landmark_path=resolve(base,cfg['landmarks']);landmarks=read(landmark_path)
-    else:
+    elif cfg.get('annotations'):
         from prepare_landmarks import prepare
         annotation_path=resolve(base,cfg['annotations']);inputs[str(annotation_path)]=sha(annotation_path)
         landmarks=prepare(cloud_path,rig_path,annotation_path,out/'landmarks');landmark_path=out/'landmarks/landmarks.json'
         if not cfg.get('source_image') and (out/'landmarks/source_rgb.png').exists():cfg['source_image']=str(out/'landmarks/source_rgb.png')
+    elif cfg.get('auto_correspondences'):
+        from discover_correspondences import discover
+        camera_path=None
+        if cfg.get('camera'):
+            camera_path=out/'source_camera.json';write(camera_path,cfg['camera'])
+        discover(cloud_path,rig_path,out/'correspondences',camera_path)
+        landmark_path=out/'correspondences/prepared/landmarks.json';landmarks=read(landmark_path)
+        if not cfg.get('source_image'):cfg['source_image']=str(out/'correspondences/source_rgb.png')
+    else:
+        raise ValueError('Enable auto_correspondences or supply annotations/landmarks')
     inputs[str(landmark_path)]=sha(landmark_path)
     if landmarks.get('source_cloud_sha256') not in [None,sha(cloud_path)]:raise ValueError('Landmarks belong to a different scene cloud')
     if landmarks.get('rig_sha256') not in [None,sha(rig_path)]:raise ValueError('Landmarks belong to a different rig definition')
@@ -85,6 +95,7 @@ def run_pipeline(config_path,output,cad_python=None):
     if len(idx):scene.add_geometry(trimesh.points.PointCloud(points[idx],colors=cloud.colors[idx]),node_name='scene_sample_for_review')
     scene.export(out/'registered_scene.glb');write(out/'part_transforms.json',transforms)
     plot_overlay(out,obj,draw,gels,cloud,idx,reg,landmarks,camera,cfg,base)
+    plot_alignment_and_gels(out,draw,gels,reg,landmarks,camera,cfg,base)
     warnings=[]
     limit=cfg.get('registration',{}).get('diagnostic_rms_mm',2.0)
     if reg['rms_3d_mm']>limit:warnings.append(f'Registration RMS {reg["rms_3d_mm"]:.3f} mm exceeds chosen review threshold {limit} mm; this threshold is not a tactile-accuracy guarantee.')
@@ -94,7 +105,7 @@ def run_pipeline(config_path,output,cad_python=None):
     if not all(sha(Path(path))==digest for path,digest in inputs.items()):raise AssertionError('An input changed during processing')
     status=dict(status='geometry_diagnostic' if warnings else 'conditional_simulation',warnings=warnings,physical_accuracy_validated=False,object_unchanged=True,poses_frozen_before_depth=True,registration_rms_mm=reg['rms_3d_mm'],registration_rms_px=reg['rms_2d_px'],scale_mm_per_world=scale,opening_change_mm=q,input_sha256=inputs,pads=[{k:p[k] for k in ['name','normal_peak_indentation_mm','camera_peak_depth_delta_mm','normal_contact_area_mm2','no_contact']} for p in report['pads']])
     write(out/'report.json',status)
-    (out/'README.md').write_text('# CAD registration and Mini simulation\n\nStatus: '+status['status']+'. All poses are estimates; physical accuracy is unvalidated.\n\n'+ '\n'.join('- '+w for w in warnings)+'\n\nSee registration.json for per-landmark/group residuals and fitted opening; mounting_audit.json for CAD/rest-surface checks; rest_pose_config.json for the frozen frames; registered_scene.glb and scene_overlay.png for placement. Prediction maps, masks, native RGB, contacts, calibration/profile metadata and depth comparison are in prediction/.\n\nRerun the original portable case JSON with run_pipeline.py into a new directory. Paths in that input are relative to the case JSON. The runtime frozen configuration records absolute paths on this machine; regenerate it after relocating the case. No object geometry or poses were adjusted to manufacture contact.\n')
+    (out/'README.md').write_text('# CAD registration and Mini simulation\n\nStatus: '+status['status']+'. All poses are estimates; physical accuracy is unvalidated.\n\n'+ '\n'.join('- '+w for w in warnings)+'\n\nSee registration.json for per-landmark/group residuals and fitted opening; mounting_audit.json for CAD/rest-surface checks; rest_pose_config.json for the frozen frames; registered_scene.glb and scene_overlay.png and cad_alignment_and_rest_gels.png for placement. Prediction maps, masks, native RGB, contacts, calibration/profile metadata and depth comparison are in prediction/.\n\nRerun the original portable case JSON with run_pipeline.py into a new directory. Paths in that input are relative to the case JSON. The runtime frozen configuration records absolute paths on this machine; regenerate it after relocating the case. No object geometry or poses were adjusted to manufacture contact.\n')
     print(out/'report.json');return status
 
 def plot_overlay(out,obj,draw,gels,cloud,idx,reg,landmarks,camera,cfg,base):
@@ -125,6 +136,42 @@ def plot_overlay(out,obj,draw,gels,cloud,idx,reg,landmarks,camera,cfg,base):
     else:
         b.bar([r['name'] for r in reg['landmarks']],[r['error_mm'] for r in reg['landmarks']]);b.tick_params(axis='x',rotation=90);b.set_ylabel('Landmark residual mm');b.set_title('3D-only registration residuals')
     fig.suptitle(f'Estimated registration: {reg["rms_3d_mm"]:.3f} mm 3D RMS; no contact-driven adjustment');fig.tight_layout();fig.savefig(out/'scene_overlay.png',dpi=150);plt.close(fig)
+
+def plot_alignment_and_gels(out,draw,gels,reg,landmarks,camera,cfg,base):
+    """Two source-camera panels: articulated CAD alignment and undeformed gels."""
+    import matplotlib;matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    from matplotlib.collections import LineCollection,PolyCollection
+    if not camera or not cfg.get('source_image'):
+        # Explicitly retain the 3D overview when a photographic projection is unavailable.
+        from shutil import copyfile
+        copyfile(out/'scene_overlay.png',out/'cad_alignment_and_rest_gels.png');return
+    from PIL import Image
+    rgb=Image.open(resolve(base,cfg['source_image']));fig,axes=plt.subplots(1,2,figsize=(13,9))
+    bounds=[]
+    for ax in axes:ax.imshow(rgb)
+    for m in draw:
+        merged=m.copy();merged.merge_vertices();uv,z=project(merged.vertices,camera)
+        edges=merged.face_adjacency_edges[merged.face_adjacency_angles>np.deg2rad(25)]
+        edges=edges[np.all(z[edges]>0,axis=1)]
+        color=np.asarray(m.visual.face_colors[0,:3])/255
+        axes[0].add_collection(LineCollection(uv[edges],colors=[color],linewidths=.6,alpha=.75))
+        bounds.append(uv[z>0])
+    for a,r in zip(landmarks['records'],reg['landmarks']):
+        if 'source_pixel' in a and 'pred_pixel' in r:
+            u,v=a['source_pixel'],r['pred_pixel'];axes[0].plot([u[0],v[0]],[u[1],v[1]],color='red',lw=.8);axes[0].plot(*u,'o',mfc='none',mec='red',ms=5)
+    for i,(m,pad) in enumerate(zip(gels,read(out/'rest_pose_config.json')['pads'])):
+        color=['#00ccff','#ff37b5'][i%2];uv,z=project(m.vertices,camera);faces=m.faces[np.all(z[m.faces]>0,axis=1)]
+        axes[1].add_collection(PolyCollection(uv[faces],facecolors=color,edgecolors='none',alpha=.5));bounds.append(uv[z>0])
+        apex,_=project(np.array([pad['origin_world']]),camera);axes[1].plot(*apex[0],'+',color='yellow',ms=11,mew=2)
+        axes[1].annotate(pad['name']+' rest apex',apex[0],xytext=(16,24 if i==0 else -30),textcoords='offset points',color='white',fontsize=10,bbox=dict(facecolor='black',alpha=.65,pad=3),arrowprops=dict(arrowstyle='-',color='white'))
+    box=np.vstack(bounds);low=np.maximum(box.min(0)-35,[0,0]);high=np.minimum(box.max(0)+35,[camera['width'],camera['height']])
+    for ax in axes:ax.set_xlim(low[0],high[0]);ax.set_ylim(high[1],low[1]);ax.set_aspect('equal');ax.axis('off')
+    axes[0].set_title('Articulated CAD registration\nCyan: body | orange: moving fingers | red: observed features')
+    axes[1].set_title('Undeformed Mini surfaces at inferred rest poses\nYellow crosses: rest apices | object alignment retained')
+    fig.suptitle('CAD alignment and rest gel surfaces',fontsize=19,fontweight='bold')
+    fig.text(.5,.025,f'Estimated scale {reg["scale_mm_per_world"]:.3f} mm/world unit | opening change {reg["opening_change_mm"]:.3f} mm | 3D RMS {reg["rms_3d_mm"]:.3f} mm\nProjection agreement is not physical accuracy; no contact-driven pose adjustment.',ha='center',fontsize=11)
+    fig.tight_layout(rect=[0,.07,1,.95]);fig.savefig(out/'cad_alignment_and_rest_gels.png',dpi=180);plt.close(fig)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',required=True);p.add_argument('--output',required=True);p.add_argument('--cad-python',help='Optional separate interpreter with requirements-cad.txt installed');a=p.parse_args();run_pipeline(a.config,a.output,a.cad_python)

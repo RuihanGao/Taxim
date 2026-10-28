@@ -1,13 +1,13 @@
 # Standalone CAD-to-depth-to-Taxim pipeline
 
-Everything required by the code is in this repository or fetched from the pinned public Hydroshear dependency. No access to the original experiment server, laptop, historical fit, previous scale estimate or previous contact outputs is required. Input paths are resolved relative to your case JSON. A private shareable avocado case bundle additionally includes that case's original mesh, cloud, full STEP, fresh CAD export and annotations; those data are not published in this repository.
+Everything required by the code is in this repository or fetched from the pinned public Hydroshear dependency. No access to the original experiment server, laptop, historical fit, previous scale estimate or previous contact outputs is required. Input paths are resolved relative to your case JSON. A private shareable avocado case bundle additionally includes that case's original mesh, cloud, full STEP, fresh CAD export and case configuration; those data are not published in this repository.
 
 ## What must be provided
 
 1. An aligned object mesh and scene point cloud, with documented common coordinates.
 2. The full gripper assembly STEP, **or** an exported CAD manifest plus the mounting/articulation definition. A standalone Mini gel CAD alone defines its undeformed shape but cannot determine the finger mounting offsets or its pose in a scene.
 3. A rig definition: moving groups, opening axis/model, CAD landmark coordinates, both actual gel part indices/apex definitions and canonical sensor bases. `rigs/umi_gs_mini.json` supplies this for the exact UMI STEP SHA recorded in that file. It is reusable for other objects with the same assembly. A different CAD revision, tag print layout or mechanism must be checked and adapted.
-4. Scene correspondences: either detected tags plus annotated rigid-feature pixels in an organized cloud, or explicit CAD-feature/scene-point pairs in an unorganized cloud. The package estimates pose, opening and scale; it does not infer arbitrary correspondences from filenames or invent an invisible mount.
+4. Observable matching scene features. Start with automatic tag/screw discovery for the supported UMI rig and an ordered RGB cloud; the agent reviews detections. Reviewed image annotations or explicit CAD-feature/scene-point pairs are alternatives. See [CORRESPONDENCES.md](CORRESPONDENCES.md) for discovery, camera recovery, and fallbacks. No prior scene pose/scale or manual clicks are required by the supported automatic path.
 
 The current articulation implementation supports a single scalar prismatic opening with explicitly specified group translations. It rejects rotary/linkage mechanisms. The UMI profile translates left/right fingers by +/-q/2 along CAD X; markers, shells and gels follow their own finger. Hidden gear/linkage angles are not solved or drawn as if fixed.
 
@@ -48,6 +48,18 @@ python gelsight_mini/run_pipeline.py --config demo_case/case.json --output demo_
 This constructs a fully specified synthetic moving-gripper CAD, cloud, object and 3D feature pairs. The true scale is 1000 mm/world unit, opening change -2 mm and nominal sphere overlap 0.4 mm per pad. Rasterized faceted geometry produces about 0.397 mm. This is a numerical example, not a measured tactile sample. All filenames in the generated case are relative; move the directory elsewhere and run it again to check portability.
 
 ## Prepare a real case
+
+For automatic discovery, copy `pipeline.auto.template.json` to your case directory, set its input paths and matching rig, and record alignment evidence. Run the same `run_pipeline.py` command below. It discovers the source camera/grid when supported, detects tags and visible screw contours, prepares landmarks, and runs registration/depth/optics. Review `correspondences/feature_crops.png`, `correspondence_candidates.png` and `discovery.json` before accepting associations. If discovery stops, refine actual observations from the saved evidence or use the alternatives below. It never substitutes CAD predictions for observed pixels.
+
+For a separate discovery-and-review pass:
+
+```bash
+python gelsight_mini/discover_correspondences.py --scene my_case/inputs/scene.ply --rig my_case/rig.json --output discovery
+```
+
+Then set `annotations` to the reviewed `discovery/annotations.json` (relative to the case JSON) instead of enabling automatic discovery. See [NEW_CHAT_PROMPT.md](NEW_CHAT_PROMPT.md) for an agent-driven workflow covering all five stages.
+
+### Explicit annotations alternative
 
 Copy `pipeline.template.json` to `my_case/case.json` and `annotations.template.json` to `my_case/annotations.json`. Put your data under `my_case/inputs/`, and copy the matching rig definition to `my_case/rig.json`. Verify the object/cloud alignment and set `alignment_verified=true` with the evidence. The pipeline never changes object alignment to create contact.
 
@@ -107,7 +119,7 @@ python gelsight_mini/run_pipeline.py \
   --cad-python /path/to/.cad-env/bin/python
 ```
 
-The pipeline prepares correspondences when `annotations` is supplied; fits a common body rotation/translation, shared metric scale and scalar opening; checks both actual CAD gel mounts against the pinned Mini surface; freezes the rest frames; and calls the unchanged full-mesh depth/optical runner. There is no historical initialization file. Body features provide the initialization; optional scale bounds must contain it. `initial_body_landmarks` may select a stable subset of fixed-body landmarks, never a prior fitted pose.
+The pipeline discovers correspondences when `auto_correspondences` is enabled or prepares supplied `annotations`; fits a common body rotation/translation, shared metric scale and scalar opening; checks both actual CAD gel mounts against the pinned Mini surface; freezes the rest frames; and calls the unchanged full-mesh depth/optical runner. There is no historical initialization file. Body features provide the initialization; optional scale bounds must contain it. `initial_body_landmarks` may select a stable subset of fixed-body landmarks, never a prior fitted pose.
 
 Registration uses robust soft-L1 residuals. Defaults are 3 mm per 3D coordinate, 1 px for detected corners and 2 px for manual features. These are fit weights, not claimed accuracy. Opening bounds belong to the rig. The 2 mm default diagnostic RMS threshold is a review threshold, not proof that smaller residuals guarantee tactile accuracy. The optimizer checks Jacobian rank and flags bound hits.
 
@@ -116,6 +128,7 @@ Registration uses robust soft-L1 residuals. Defaults are 3 mm per 3D coordinate,
 - `registration.json`: scale/opening/body transform, landmark and group residuals, image RMS where available, rank/bound diagnostics.
 - `mounting_audit.json`: both apex definitions and pinned-surface-to-CAD discrepancies.
 - `rest_pose_config.json`: frozen rest origins and right-handed basis columns. Runtime absolute paths describe the current machine; after moving inputs, rerun the portable case JSON to regenerate them.
+- `cad_alignment_and_rest_gels.png`: two source-camera panels showing articulated CAD and actual rest gels; explicitly labelled 3D overview if a source image/mapping is unavailable.
 - `part_transforms.json`, `registered_scene.glb`, `scene_overlay.png`: registered rigid groups, actual rest surfaces, unchanged object and a cloud sample.
 - `prediction/<pad>/`: normal indentation mm; nominal/deformed camera depths mm; camera delta mm; float32 renderer delta metres; support/contact masks; native RGB; contacts back in original scene; per-pad diagnostics.
 - `prediction/fixed_pose_estimate.png`: both depth maps and Taxim outputs on comparable colour scales.

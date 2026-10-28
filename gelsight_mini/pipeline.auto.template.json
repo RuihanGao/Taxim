@@ -1,0 +1,18 @@
+{
+  "case_name": "replace_case",
+  "object_mesh": "inputs/object.obj",
+  "scene_cloud": "inputs/scene.ply",
+  "cad_step": "inputs/assembled_umi.step",
+  "cad_manifest": null,
+  "rig_profile": "rig.json",
+  "annotations": null,
+  "landmarks": null,
+  "alignment_verified": false,
+  "alignment_evidence": "",
+  "registration": {
+    "sigma_3d_mm": 3.0,
+    "diagnostic_rms_mm": 2.0
+  },
+  "assumptions": [],
+  "auto_correspondences": true
+}

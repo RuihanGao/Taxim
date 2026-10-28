@@ -2,6 +2,7 @@
 
 This optional module reproduces the approved GelSight Mini path from the VTCotraining experiments. It adds a checked adapter around the **pinned Hydroshear tensorized Taxim implementation**. It does not replace Taxim's original optical renderer or modify its other sensor modes.
 
+- [Automatic correspondence discovery and fallbacks](docs/CORRESPONDENCES.md)
 - [Complete standalone CAD registration workflow](docs/STANDALONE.md)
 - [Deployment instructions and full change list](docs/DEPLOYMENT.md)
 - [Copyable prompt for a new object/scene](docs/NEW_CHAT_PROMPT.md)
@@ -47,7 +48,7 @@ python gelsight_mini/make_demo.py --output demo_case
 python gelsight_mini/run_pipeline.py --config demo_case/case.json --output demo_result
 ```
 
-For real inputs, use `pipeline.template.json`, the matching rig definition and scene annotations or paired CAD/scene landmarks. Run:
+For real inputs, start with `pipeline.auto.template.json` and the matching rig to discover tag/screw correspondences from a verified ordered RGB cloud. The agent reviews the generated crops. For explicit annotations or 3D pairs, use `pipeline.template.json`. Run:
 
 ```bash
 python gelsight_mini/run_pipeline.py --config /path/case.json --output /path/new_result
@@ -65,7 +66,7 @@ python gelsight_mini/mini_pose/run_case.py \
   --config /path/case.json --output /path/new_case_result
 ```
 
-`run_case.py` consumes already frozen poses. `run_pipeline.py` adds supervised registration from declared CAD/scene correspondences. It is not an arbitrary-CAD recognition system: use the matching rig geometry and annotate identifiable features in each new scene. Supported articulation is a scalar prismatic opening; do not reuse avocado pixels/camera parameters for another capture.
+`run_case.py` consumes already frozen poses. `run_pipeline.py` adds automatic correspondence discovery for the supported tagged UMI rig, or registration from reviewed annotations/3D pairs. Discovery uses known hardware geometry and observed image features; arbitrary-CAD recognition and generic unorganized-cloud matching are not implemented. Supported articulation is a scalar prismatic opening; do not reuse avocado pixels/camera parameters for another capture.
 
 Each pad result includes normal indentation in mm; nominal/deformed camera depths in mm; camera depth difference in mm; float32 renderer input in metres; gel/contact masks; `tactile_rgb.png`; contact points on the full object transformed back to the original world; and pose/scale/numerical diagnostics. The runner also creates a common-scale comparison figure and a scene GLB. The normal-grid footprint is a sampled projected area, not measured pressure or curved contact area.
 
