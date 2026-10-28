@@ -38,5 +38,35 @@
   ],
   "approved_reference_files_unchanged": true,
   "new_server_fresh_pip_install_tested": false,
-  "physical_tactile_accuracy_validated": false
+  "physical_tactile_accuracy_validated": false,
+  "standalone_pipeline": {
+    "date": "2026-10-28",
+    "optical_tests_passed": 12,
+    "registration_tests_passed": 9,
+    "geometry_tests_passed": 5,
+    "total_tests_passed": 26,
+    "synthetic_end_to_end": true,
+    "synthetic_scale_recovered": 1000,
+    "synthetic_opening_change_recovered_mm": -2,
+    "synthetic_peak_mm": [
+      0.39657994603034397,
+      0.39657975047402694
+    ],
+    "fresh_full_STEP_import_leaf_count": 58,
+    "all_15_used_CAD_part_bounds_match_prior_inspection_exactly": true,
+    "relocated_package_end_to_end": true,
+    "all_case_input_paths_inside_relocated_bundle": true,
+    "external_dependency_fetched_fresh": true,
+    "source_camera_grid_mapping_checked": true,
+    "avocado_result_is_geometry_diagnostic": true,
+    "all_saved_images_decode": true,
+    "approved_cube_sources_results_unchanged": true,
+    "fresh_dependency_pip_install_tested": false,
+    "physical_accuracy_validated": false,
+    "avocado_replay_tolerances": {
+      "scale_mm_per_world": 0.0001,
+      "opening_change_mm": 0.0001,
+      "rms_3d_mm": 0.0001
+    }
+  }
 }

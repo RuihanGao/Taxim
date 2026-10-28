@@ -1,0 +1,243 @@
+{
+  "name": "UMI assembled_umi STEP revision ead21040",
+  "cad_sha256": "ead21040c278a4b1c026a1ae8b2c5347231fed1dc61085f592879f25716a2f4a",
+  "kinematics": {
+    "type": "scalar_prismatic",
+    "group_translation_per_q": {
+      "body": [
+        0,
+        0,
+        0
+      ],
+      "left": [
+        0.5,
+        0,
+        0
+      ],
+      "right": [
+        -0.5,
+        0,
+        0
+      ]
+    },
+    "q_bounds_mm": [
+      -65,
+      60
+    ],
+    "description": "q changes total jaw separation from STEP state; symmetric rack and guide translation; limits are explicit model bounds, not measured stop positions"
+  },
+  "part_groups": {
+    "body": [
+      0,
+      1,
+      2,
+      6,
+      55
+    ],
+    "left": [
+      46,
+      47,
+      48,
+      50,
+      57
+    ],
+    "right": [
+      49,
+      51,
+      52,
+      53,
+      56
+    ]
+  },
+  "features": [
+    {
+      "name": "cover_left",
+      "group": "body",
+      "cad_mm": [
+        76,
+        36.4,
+        22.2
+      ]
+    },
+    {
+      "name": "cover_right",
+      "group": "body",
+      "cad_mm": [
+        -76,
+        36.4,
+        22.2
+      ]
+    },
+    {
+      "name": "cover_upper",
+      "group": "body",
+      "cad_mm": [
+        -15.3,
+        -18.44,
+        22.2
+      ]
+    },
+    {
+      "name": "rail_left",
+      "group": "body",
+      "cad_mm": [
+        70,
+        61,
+        0
+      ]
+    },
+    {
+      "name": "rail_right",
+      "group": "body",
+      "cad_mm": [
+        -70,
+        61,
+        0
+      ]
+    },
+    {
+      "name": "finger_left_upper_screw",
+      "group": "left",
+      "cad_mm": [
+        73,
+        129.4118824,
+        -2.4
+      ]
+    },
+    {
+      "name": "finger_left_lower_screw",
+      "group": "left",
+      "cad_mm": [
+        73,
+        147.4118824,
+        -2.4
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "id": 7,
+      "family": "DICT_APRILTAG_36h11",
+      "group": "left",
+      "cad_corners_detector_order_mm": [
+        [
+          42.400000000000006,
+          106.82842712,
+          12.4
+        ],
+        [
+          62.60000000000001,
+          106.82842712,
+          12.4
+        ],
+        [
+          62.60000000000001,
+          86.62842712,
+          12.4
+        ],
+        [
+          42.400000000000006,
+          86.62842712,
+          12.4
+        ]
+      ],
+      "note": "20.2 mm black square approximated by CAD recess. Verify physical print size, placement and encoded orientation for another rig."
+    },
+    {
+      "id": 4,
+      "family": "DICT_APRILTAG_36h11",
+      "group": "right",
+      "cad_corners_detector_order_mm": [
+        [
+          -42.400000000000006,
+          86.62842712,
+          12.4
+        ],
+        [
+          -62.60000000000001,
+          86.62842712,
+          12.4
+        ],
+        [
+          -62.60000000000001,
+          106.82842712,
+          12.4
+        ],
+        [
+          -42.400000000000006,
+          106.82842712,
+          12.4
+        ]
+      ],
+      "note": "20.2 mm black square approximated by CAD recess. Verify physical print size, placement and encoded orientation for another rig."
+    }
+  ],
+  "pads": [
+    {
+      "name": "left",
+      "group": "left",
+      "gel_part_index": 47,
+      "apex_from_extremum": {
+        "axis": 0,
+        "which": "min"
+      },
+      "basis_columns_cad": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "inward_cad": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "mount_check_tolerance_mm": 0.05,
+      "orientation_source": "Both actual STEP Mini instances; native x is CAD +Z. For the same photographed hardware the marked long edge is native right / 320-pixel edge; CCW landscape preview places it at top. Reverify on different hardware."
+    },
+    {
+      "name": "right",
+      "group": "right",
+      "gel_part_index": 53,
+      "apex_from_extremum": {
+        "axis": 0,
+        "which": "max"
+      },
+      "basis_columns_cad": [
+        [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "inward_cad": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "mount_check_tolerance_mm": 0.05,
+      "orientation_source": "Both actual STEP Mini instances; native x is CAD +Z. For the same photographed hardware the marked long edge is native right / 320-pixel edge; CCW landscape preview places it at top. Reverify on different hardware."
+    }
+  ]
+}

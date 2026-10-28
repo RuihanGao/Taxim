@@ -1,0 +1,7 @@
+{
+  "organized_cloud": null,
+  "camera": null,
+  "detect_tag_ids": [],
+  "features": [],
+  "instructions": "For an unorganized cloud, fill features with rig-feature name and scene_point_index or world XYZ. For ordered RGB data, provide verified camera/grid metadata, detect_tag_ids, and manual feature source_pixel pairs. See docs/STANDALONE.md."
+}

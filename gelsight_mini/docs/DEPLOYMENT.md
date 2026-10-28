@@ -30,7 +30,7 @@ The tensorized renderer suppresses depth changes below 1 micrometre, converts th
 
 The optical server can start with a valid camera-depth-difference map; it does not need CAD software. Full depth estimation additionally needs object geometry and reliable rest poses/scale. Our selected UMI workflow registers the **full assembly**, one common body transform/scale and synchronized CAD-X finger translation. Markers and Mini mounts move with each finger. Rest apices are obtained from both actual Mini instances after assembly transforms; generic SHELL/COMPOUND names must not be filtered out.
 
-This stage requires scene-specific correspondences. It is not a general automatic STEP-to-point-cloud solver. Tag family/IDs, print dimensions, camera mapping, gripper articulation, metric scale and sensor image orientation need checking for each case. The new-chat prompt points to the case preparation implementation on Baymax and requires those values to be generalized, not copied from avocado.
+The standalone registration implementation is now included: `export_step.py`, `prepare_landmarks.py`, `registration/fit.py`, `run_pipeline.py`, rig/annotation templates and a public synthetic demo. It estimates scale and body pose from current fixed-body landmarks, with no historical initializer file. It supports declared scalar-prismatic articulation, automatic tag corners with a verified organized-cloud camera mapping, or explicit 3D pairs for an unorganized cloud. See [STANDALONE.md](STANDALONE.md). Scene-specific correspondences and correct mounting geometry remain required; this is not an arbitrary-CAD recognition system.
 
 The CAD defines the undeformed shape and mount offsets, but registration makes its world pose **estimated**, not exact measured ground truth. The avocado fit still produced incompatible object intersections despite a close image overlay. That case demonstrates the need to report 3D residuals and relative mesh/gripper uncertainty; it is not a tactile accuracy benchmark.
 
@@ -44,7 +44,7 @@ source .mini-env/bin/activate
 python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r gelsight_mini/requirements.txt
 python gelsight_mini/fetch_sources.py
-python -m unittest discover -s gelsight_mini/tests -p test_optical.py -v
+python -m unittest discover -s gelsight_mini/tests -p 'test_*.py' -v
 python -m unittest discover -s gelsight_mini/mini_pose -p test_case.py -v
 python gelsight_mini/render_depth.py \
   --input /path/camera_depth_delta_m.npy --output /path/new_output/tactile_rgb.png
