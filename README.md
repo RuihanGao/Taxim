@@ -71,3 +71,8 @@ If you use Taxim in your research, please cite:
 ```
 
 
+
+
+## GelSight Mini integration branch
+
+This branch adds an optional [GelSight Mini module](gelsight_mini/README.md) using the pinned Hydroshear tensorized Taxim backend, checked 125-bin Mini calibration, fixed-pose mesh depth and reproducibility tests. See the [deployment handoff](gelsight_mini/docs/DEPLOYMENT.md) and [new-scene prompt](gelsight_mini/docs/NEW_CHAT_PROMPT.md). The original Taxim sensor implementations remain unchanged.

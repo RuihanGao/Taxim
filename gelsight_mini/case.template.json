@@ -1,0 +1,30 @@
+{
+  "case_name": "replace_case_name",
+  "object_mesh": "/absolute/path/to/aligned_object.obj",
+  "scene_cloud": "/absolute/path/to/scene.ply",
+  "mm_per_world_unit": null,
+  "scale_source": "",
+  "alignment_verified": false,
+  "alignment_evidence": "",
+  "pads": [
+    {
+      "name": "left",
+      "origin_world": null,
+      "basis_columns_world": null,
+      "normal_toward_sensor_world": null,
+      "origin_definition": "undeformed_gel_rest_apex",
+      "pose_source": "",
+      "orientation_source": ""
+    },
+    {
+      "name": "right",
+      "origin_world": null,
+      "basis_columns_world": null,
+      "normal_toward_sensor_world": null,
+      "origin_definition": "undeformed_gel_rest_apex",
+      "pose_source": "",
+      "orientation_source": ""
+    }
+  ],
+  "assumptions": []
+}

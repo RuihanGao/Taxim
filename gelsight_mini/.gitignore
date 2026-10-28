@@ -1,0 +1,8 @@
+vendor/
+outputs/
+__pycache__/
+*.pyc
+*.nbc
+*.nbi
+.env/
+.venv/

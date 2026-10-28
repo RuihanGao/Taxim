@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-28",
+  "python": "3.11",
+  "environment": "Existing Baymax VTCotraining .env; Torch 2.5.1+cu121 executing on CPU",
+  "external_dependency": "Fresh isolated fetch at pinned Hydroshear revision; original checkout untouched",
+  "optical_tests_passed": 12,
+  "geometry_tests_passed": 5,
+  "synthetic_golden_cases": 3,
+  "approved_core_sources_byte_identical": {
+    "mini_optical/adapter.py": true,
+    "mini_depth/geometry.py": true,
+    "mini_depth/profile.py": true,
+    "mini_pose/run_case.py": true
+  },
+  "cube_fixed_pose_parity": [
+    {
+      "pad": "left",
+      "rgb_png_sha256": "5fba590b735dfc926b3f7abee26f4a5c5545a3a8ab3b8dea349a387dc388560c",
+      "exact_depth_arrays": [
+        "normal_indentation_mm.npy",
+        "nominal_camera_depth_mm.npy",
+        "deformed_camera_depth_mm.npy",
+        "camera_depth_delta_mm.npy",
+        "hydroshear_depth_delta_m.npy"
+      ]
+    },
+    {
+      "pad": "right",
+      "rgb_png_sha256": "54ef08f75b45e78928849daf8dbc99088faeff6eabd52ef34ad299cbdb6a6b4f",
+      "exact_depth_arrays": [
+        "normal_indentation_mm.npy",
+        "nominal_camera_depth_mm.npy",
+        "deformed_camera_depth_mm.npy",
+        "camera_depth_delta_mm.npy",
+        "hydroshear_depth_delta_m.npy"
+      ]
+    }
+  ],
+  "approved_reference_files_unchanged": true,
+  "new_server_fresh_pip_install_tested": false,
+  "physical_tactile_accuracy_validated": false
+}

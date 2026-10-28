@@ -1,0 +1,44 @@
+{
+  "source": "Golden RGB byte hashes generated with the unchanged approved Baymax adapter before testing this port. Synthetic depth inputs, no private scene data.",
+  "renderer": {
+    "hydroshear_revision": "f815b82fdf3451852acd918933020a82cede1f3b",
+    "upstream_source_sha256": "ea7db8c81791f5915b7b92fe20b3eff2ec36617f0979d763ae8dabeb7272969c",
+    "calibration_sha256": "34937ac09579b259fd344f99fbc71ebb41a6ad8bbe5f75118d016ada8fbb044a",
+    "background_path": "vendor/hydroshear/rl/tacsl_sensors/tactile_utils/gs_mini_data/mmint_gs_mini_2D9C-N227_07072025_bg_R_no_dots.png",
+    "background_sha256": "aaa0fdbfb7bb35a1223a4d1120b20b2a2bcdacb4030a74d22756b6bc46264cad",
+    "original_config_bins": 120,
+    "calibration_bins": 125,
+    "effective_bins": 125,
+    "coefficient_shape": [
+      125,
+      125,
+      6
+    ],
+    "legacy_diagnostic_only": false,
+    "height": 320,
+    "width": 240,
+    "optical_mm_per_pixel": 0.065,
+    "magnitude_bin_step_rad": 0.012667712312862069,
+    "direction_bin_step_rad": 0.050670849251448276,
+    "renderer_method": "gelsightRender.render_tensorized",
+    "device": "cpu",
+    "channel_order": "RGB",
+    "input_units": "metres; positive nominal depth minus current depth",
+    "output": "upstream-clipped uint8 RGB; no display contrast normalization"
+  },
+  "hash_definition": "SHA256 of contiguous uint8 RGB array bytes, not encoded PNG bytes",
+  "cases": {
+    "zero": {
+      "depth_float32_bytes_sha256": "7818f5542a0404157573be6cffc0e0c8e68ce3c0f5d17d07ccdd9313fb700baf",
+      "rgb_uint8_bytes_sha256": "9be0164cea604fb6e001fd8af994ff5de2fd16d6a60550992c2b9676847f3a2a"
+    },
+    "asymmetric": {
+      "depth_float32_bytes_sha256": "2de89c4e9a4e13545f9872e10a70f1e90eb88761a089b889f4fe4c8d7f0c0445",
+      "rgb_uint8_bytes_sha256": "a45440fba6ba4b3190837512d756ac628eb68595033cca516c2b81eb4eb1ddd9"
+    },
+    "boundary": {
+      "depth_float32_bytes_sha256": "c6d509d51777a15108ea54580b60404ccfd7e80fd3c69bd716d6d60db3d3ad34",
+      "rgb_uint8_bytes_sha256": "ff78434a2e6c0d90910c64383cac7ab15efdaf2bb9e83596e4401a1d896d6a70"
+    }
+  }
+}
